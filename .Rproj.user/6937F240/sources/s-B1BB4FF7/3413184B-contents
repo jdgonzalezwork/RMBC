@@ -1,0 +1,159 @@
+rm(list=ls())
+source("performanceMeasures.R");
+source("RMBC_generalFunctions.R");
+source("internalUseFunctions.R");
+source("INITprocedures.R");
+source("dataGeneratingProcesses.R");
+packages=c("tclust","RSKC","GSE","otrimle","mclust",
+           "mvtnorm","dplyr", "ktaucenters","xtable"); 
+for (i in 1:length(packages)){
+  if(packages[i] %in% rownames(installed.packages())==FALSE){ 
+    install.packages(packages[i])
+  }
+  library(packages[i],character.only = TRUE)
+}
+
+
+
+
+load("phytoplankton_acoustic_data.RData")
+n=dim(Y)[1]
+Yclean=Y[-outliers_index,]
+trueOutliers=Y[outliers_index,]
+actualk=2
+coordinates=c(1,2)
+YGraf=Y
+tituloGraf=""
+
+pdf(file="RawDataSet2020.pdf",width = 5.5,height = 5.5)
+plot(YGraf[,coordinates],
+     main=tituloGraf,cex.main=3,
+     lwd=1,pch=19, cex=1, type="n",xlab="x1",ylab="x2",
+     xlim=c(0,1.1),ylim=c(0,43))
+points(trueOutliers,lwd=2,cex=1,pch=4)
+points(Yclean,col=1,lwd=1.5,pch=21, bg=4, cex=1)
+dev.off()
+
+
+actualk=3
+mod1= densityMclust(Y,G=actualk)
+
+
+
+
+
+
+
+##############################################################
+# Compute clusters for Classic Case
+##############################################################
+thetaNewClas.alpha=rep(0,actualk);
+thetaNewClas.mu=vector(mode="list", length=actualk)
+thetaNewClas.sigma=vector(mode="list", length=actualk)
+for (j in 1:actualk){
+  thetaNewClas.alpha[[j]]=mod1$parameters$pro[j]
+  thetaNewClas.mu[[j]]=mod1$parameters$mean[,j]
+  thetaNewClas.sigma[[j]]=mod1$parameters$variance$sigma[,,j]
+}
+
+# We estimate Allocation of Points to Clusters. As is stated in Sec. 5.1
+# of the manuscript
+
+salqs=qsCoreto(Y = Y,theta.alpha =   thetaNewClas.alpha,
+               theta.mu =thetaNewClas.mu,theta.sigma = thetaNewClas.sigma)
+
+indices2MCLUST=apply(salqs,1,function(x) which(x==max(x))[1])
+
+colors=1+1:3
+
+pdf(file="MClustk3.pdf",width = 7,height = 7)
+tituloGraf=paste("MCLUST")
+YGraf=Y; indicesGraf=indices2MCLUST; theta.mu=thetaNewClas.mu
+nonOutliersEstimadosGraf=rep(T,length(indicesGraf))
+theta.sigma=thetaNewClas.sigma
+#source("auxPlotGroupsModelBasedCluster.R")
+#auxPlotGroupsModelBasedCluster()
+
+coordinates=c(1,2)
+plot(YGraf[,coordinates],
+     main=tituloGraf,cex.main=3,xlab="",ylab="",lwd=1,pch=19, cex=.7, type="n",
+     #xlim=c(0.5,1.2),ylim=c(0,43))
+     xlim=c(0,1.1),ylim=c(0,43))
+symbols=c(19,20,16)
+for (j in 1:length(colors)){
+  Ygrupo= YGraf[(indicesGraf==j) & nonOutliersEstimadosGraf,coordinates]; ngrupo=dim(Ygrupo)[1]; 
+  points(Ygrupo,col=colors[j],lwd=1.5,pch=symbols[j],cex=1)
+  # ejes= ellipse(theta.sigma[[j]][coordinates,coordinates],  
+  #              centre = theta.mu[[j]][coordinates] ,level=0.75)
+  points(theta.mu[[j]][coordinates[1]],theta.mu[[j]][coordinates[2]], pch=22, bg=colors[j],cex=4,lwd=3)
+  # lines(ejes[,1],ejes[,2],lwd=4,col="blue",lty=2 )
+}
+
+points(YGraf[!nonOutliersEstimadosGraf,1],YGraf[!nonOutliersEstimadosGraf,2],lwd=4,cex=2,pch=4)
+
+for (j in 1:actualk){
+  Ygrupo= YGraf[(indicesGraf==j) & nonOutliersEstimadosGraf,coordinates]; ngrupo=dim(Ygrupo)[1]; 
+  #####  points(Ygrupo,col=j+1,lwd=3)
+  ejes= ellipse(theta.sigma[[j]][coordinates,coordinates],  
+                centre = theta.mu[[j]][coordinates] ,level=0.99)
+  ####points(theta.mu[[j]][coordinates[1]],theta.mu[[j]][coordinates[2]], pch=22, bg=colors[j],cex=2,lwd=2)
+  lines(ejes[,1],ejes[,2],lwd=4,col=1,lty=1 )
+}
+dev.off()
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+resultRMBC=RMBC(Y = Y,actualk = actualk)
+###########################################################
+##############################################################
+# Compute clusters for RMBC
+##############################################################
+thetaNew.mu=resultRMBC$thetaNew.mu;
+thetaNew.sigma=resultRMBC$thetaNew.sigma;
+thetaNew.alpha=resultRMBC$thetaNew.alpha
+salqs=qsCoreto(Y = Y,theta.alpha = thetaNew.alpha,
+               theta.mu = thetaNew.mu,theta.sigma = thetaNew.sigma)
+
+nonOutliersEstimadosRMBC=estaEnGRalpha(Y = Y,theta.mu =thetaNew.mu,theta.sigma = thetaNew.sigma,
+                                       nivelAlpha=1e-3)
+indices2RMBC=apply(salqs,1,function(x) which(x==max(x))[1])
+
+
+tituloGraf=paste("RMBC (This work)")
+nonOutliersEstimadosGraf=nonOutliersEstimadosRMBC
+YGraf=Y; indicesGraf=indices2RMBC;
+theta.mu=thetaNew.mu
+theta.sigma=thetaNew.sigma
+
+pdf(file="RMBCk3.pdf",width = 7,height = 7)
+
+coordinates=c(1,2)
+plot(YGraf[,coordinates],
+     main=tituloGraf,cex.main=3,xlab="",ylab="",lwd=1,pch=19, cex=.7, type="n",
+     #xlim=c(0.5,1.2),ylim=c(0,43))
+     xlim=c(0,1.1),ylim=c(0,43))
+symbols=c(19,20,16)
+for (j in 1:length(colors)){
+  Ygrupo= YGraf[(indicesGraf==j) & nonOutliersEstimadosGraf,coordinates]; ngrupo=dim(Ygrupo)[1]; 
+  points(Ygrupo,col=colors[j],lwd=1.5,pch=symbols[j],cex=1)
+  # ejes= ellipse(theta.sigma[[j]][coordinates,coordinates],  
+  #              centre = theta.mu[[j]][coordinates] ,level=0.75)
+ # points(theta.mu[[j]][coordinates[1]],theta.mu[[j]][coordinates[2]], pch=22, bg=colors[j],cex=4,lwd=3)
+  # lines(ejes[,1],ejes[,2],lwd=4,col="blue",lty=2 )
+}
+
+points(YGraf[!nonOutliersEstimadosGraf,1],YGraf[!nonOutliersEstimadosGraf,2],lwd=1,cex=1,pch=4)
+
+for (j in 1:actualk){#
+  Ygrupo= YGraf[(indicesGraf==j) & nonOutliersEstimadosGraf,coordinates]; ngrupo=dim(Ygrupo)[1]; 
+  #####  points(Ygrupo,col=j+1,lwd=3)
+  ejes= ellipse(theta.sigma[[j]][coordinates,coordinates],  
+                centre = theta.mu[[j]][coordinates] ,level=0.95)
+  ####points(theta.mu[[j]][coordinates[1]],theta.mu[[j]][coordinates[2]], pch=22, bg=colors[j],cex=2,lwd=2)
+  lines(ejes[,1],ejes[,2],lwd=4,col=1,lty=1 )
+}
+
+sum(!nonOutliersEstimadosGraf)
+dev.off()
