@@ -17,9 +17,19 @@ The reference is _Robust Model-Based_ Clustering, Juan D. Gonzalez, Ricardo Maro
 
 
 # How to use the package RMBC
-----------------------------------
+------------------------------
+
+Firstly, you should install the package from github, by typing  
 
 ``` {.r}
+devtools::install_github("jdgonzalezwork/RMBC")
+``` 
+where the package [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html) must be previously installed.
+
+The following routine 
+
+``` {.r}
+library("RMBC")
 # Generate Sintetic data (three normal cluster in two dimension)
 # clusters have different shapes and orentation.
 # The data is contaminated uniformly (level 20%).
@@ -28,7 +38,7 @@ The reference is _Robust Model-Based_ Clustering, Juan D. Gonzalez, Ricardo Maro
 ##############################################
 
 # generates base clusters
-
+set.seed(1)
 Z1 <- c(rnorm(100,0),rnorm(100,0),rnorm(100,0))
 Z2 <- rnorm(300);
 X <-  matrix(0, ncol=2,nrow=300);
@@ -44,7 +54,7 @@ B=aux1%*%aux2%*%t(aux1)
 
 X[true.cluster==3,]=X[true.cluster==3,]%*%aux2%*%aux1 + 
 matrix(c(15,2), byrow = TRUE,nrow=100,ncol=2)
-X[true.cluster==2,2] = X[true.cluster==2,2]*4
+X[true.cluster==2,2] = X[true.cluster==2,2]*2
 X[true.cluster==1,2] = X[true.cluster==1,2]*0.1
 X[true.cluster==1, ] = X[true.cluster==1,]+ 
 matrix(c(-15,-1),byrow = TRUE,nrow=100,ncol=2)
@@ -68,13 +78,13 @@ cluster = ret$cluster
 ### plotting results ########################
 #############################################
 oldpar=par(mfrow=c(1,2))
-plot(X,  main="actual clusters" )
+plot(X,  main="Actual Clusters")
 for (j in 1:3){
   points(X[true.cluster==j,],pch=19, col=j+1)
 }
 points(X[outliers,],pch=19,col=1)
 
-plot(X,main="clusters estimation")
+plot(X,main="Clusters Estimation")
 for (j in 1:3){
   points(X[cluster==j,],pch=19, col=j+1)
 }
@@ -82,6 +92,10 @@ points(X[ret$outliers,],pch=19,col=1)
 par(oldpar)
 ```
 
-The preprint [arxiv:1906.08198](https://arxiv.org/abs/1906.08198)) contains comparison with other robust model-based clustering procedures as well as technical details and applications.   
+![alt text](https://github.com/jdgonzalezwork/RMBC/blob/main/result.png)
+
+
+
+The preprint [arxiv:1906.08198](https://arxiv.org/abs/1906.08198)) contains theoretical results and comparisons with other robust model-based clustering procedures as well as technical details and applications.   
 
 
