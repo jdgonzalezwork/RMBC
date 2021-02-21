@@ -26,7 +26,7 @@ devtools::install_github("jdgonzalezwork/RMBC")
 ``` 
 where the package [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html) must be previously installed.
 
-The following routine 
+The following routine generates sythetic data and runs the `RMBC` algorithm. 
 
 ``` {.r}
 library("RMBC")
@@ -99,7 +99,7 @@ several synthetic scenarios as well as to real data.
 
 
 
-The preprint [1] contains theoretical results and comparisons with other robust model-based clustering procedures as well as technical details and applications.   
+The preprint [1] contains theoretical results and comparisons with other robust model-based clustering procedures, and technical details and applications.   
 
 *References:*
 
