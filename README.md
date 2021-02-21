@@ -1,162 +1,87 @@
-# ktaucenters package: Robust and efficient Clustering 
+# RMBC package: Robust and efficient Clustering 
 ====================================================
 
-#### Juan D. Gonzalez, Victor J. Yohai, Ruben H. Zamar 
+#### Juan D. Gonzalez, Ricardo Maronna, Victor J. Yohai and Ruben H. Zamar 
 
 
 ## Introduction
 ------------
 
-This package implements a clustering algorithm similar to kmeans, it has
-two main advantages:
+This package implements a clustering algorithm similar to Expectation Maximization 
+algorithm for multivariate Gaussian finite mixture models by using Robust S estimator its main advantage is that The estimator is resistant to outliers, that means that results of
+    estimator are still correct when there are atipycal values in the   sample.
 
--   The estimator is resistant to outliers, that means that results of
-    estimator are still correct when there are atipycal values in the
-    sample.
-
--   The estimator is efficient, roughly speaking, if there are not
-    outliers in the sample (all data is good), results will be similar
-    than those obtained by a classic algorithm (kmeans)
-
-Clustering procedure is carried out by minimizing the overall robust
-scale so-called tau scale (see Yohai Gonzalez, Yohai and Zamar 2019
-[arxiv:1906.08198](https://arxiv.org/abs/1906.08198)).
+The reference is _Robust Model-Based_ Clustering, Juan D. Gonzalez, Ricardo Maronna
+, Victor J. Yohai, and Ruben H. Zamar [arxiv:2102.06851](https://arxiv.org/pdf/2102.06851.pdf).
 
 
 
-# How to use the package ktaucenters
+# How to use the package RMBC
 ----------------------------------
 
-### Example 1: behavior when data are clean
-
-First we load the package ktaucenters
 ``` {.r}
-rm(list=ls())
-library(ktaucenters)
-```
+# Generate Sintetic data (three normal cluster in two dimension)
+# clusters have different shapes and orentation.
+# The data is contaminated uniformly (level 20%).
+################################################
+#### Start data generating process ############
+##############################################
 
-We generate synthetic data (three cluster well separated), and apply a
-classic algorithm (kmeans) and the robust ktaucenters. Results and code
-are shown below.
+# generates base clusters
 
-``` {.r}
-# Generate synthetic data (three cluster well separated)
-set.seed(1)
-Z <- rnorm(600);
-mues <- rep(c(-4, 0, 4), 200)
-X <-  matrix(Z + mues, ncol=2)
+Z1 <- c(rnorm(100,0),rnorm(100,0),rnorm(100,0))
+Z2 <- rnorm(300);
+X <-  matrix(0, ncol=2,nrow=300);
+X[,1]=Z1;X[,2]=Z2
+true.cluster= c(rep(1,100),rep(2,100),rep(3,100))
+# rotate, expand and translate base clusters
+theta=pi/3;
+aux1=matrix(c(cos(theta),-sin(theta),sin(theta),cos(theta)),nrow=2)
 
-### Applying the ROBUST algortihm  ####
-ktau_output <- ktaucenters(X, K=3,nstart=10)
-### Applying the classic algortihm  ####
-kmeans_output <- kmeans(X,centers=3,nstart=10)
+aux2=sqrt(4)*diag(c(1,1/4))
 
-### plotting the center results 
-plot(X,main=" Efficiency")
-points(ktau_output$centers,pch=19,col=2,cex=2)
-points(kmeans_output$centers,pch=17,col=3,cex=2)
-legend(-6,6,pch=c(19,17),col=c(2,3),cex=1,legend=c("ktau centers" ,"kmeans centers"))
-```
+B=aux1%*%aux2%*%t(aux1)
 
-### Example 2: behavior in the presence of outliers
+X[true.cluster==3,]=X[true.cluster==3,]%*%aux2%*%aux1 + 
+matrix(c(15,2), byrow = TRUE,nrow=100,ncol=2)
+X[true.cluster==2,2] = X[true.cluster==2,2]*4
+X[true.cluster==1,2] = X[true.cluster==1,2]*0.1
+X[true.cluster==1, ] = X[true.cluster==1,]+ 
+matrix(c(-15,-1),byrow = TRUE,nrow=100,ncol=2)
 
-We contaminate the previous data by replacing 60 observations to
-outliers located in a bounding box that contains the clean data. Then we
-apply kmeans and ktaucenters algorithms.
+### Generate 60 sintetic outliers (contamination level 20%)
 
-``` {.r}
-# Generate 60 sintetic outliers (contamination level 20%)
-X[sample(1:300,60), ] <- matrix(runif( 40, 2* min(X), 2 * max(X) ),
-                                ncol = 2, nrow = 60)
+outliers=sample(1:300,60)
+X[outliers, ] <- matrix(runif( 40, 2 * min(X), 2 * max(X) ),
+                        ncol = 2, nrow = 60)
 
-### Applying the ROBUST algortihm  ####
-ktau_output <- ktaucenters(X, K=3,nstart=10)
-### Applying the classic algortihm  ####
-kmeans_output <- kmeans(X,centers=3,nstart=10)
-```
-plotting the estimated centers
-``` {.r}  
-plot(X,main=" Robustness ")
-points(ktau_output$centers,pch=19,col=2,cex=2)
-points(kmeans_output$centers,pch=17,col=3,cex=2)
-legend(-10,10,pch=c(19,17),col=c(2,3),cex=1,legend=c("ktau centers" ,"kmeans centers"))
-```
+###############################################
+#### END data generating process ############
+#############################################
 
+### APLYING RMBC ALGORITHM 
 
+ret = RMBC(Y=X, K=3,max_iter = 82)
 
-As it can be observed in Figure kmeans center were very influenced by
-outliers, while ktaucenters results are still razonable.
-
-
-### Example 3: Showing clusters and outliers detection procedure
-
-Continuation from Example 2, for outliers recognition purposes we can
-see the `ktau_output$outliers` that indicates the indices that may be
-considered as outliers, on the other hand, the labels of each cluster
-found by the algorithm are coded with integers between 1 and K (in this
-case K=3), the variable `ktau_output$clusters` contains that
-information.
-
-``` {.r}
-plot(X,main=" Estimated clusters and outliers detection ")
-## plottig clusters 
+cluster = ret$cluster
+#############################################
+### plotting results ########################
+#############################################
+oldpar=par(mfrow=c(1,2))
+plot(X,  main="actual clusters" )
 for (j in 1:3){
-  points(X[ktau_output$cluster==j, ], col=j+1)
+  points(X[true.cluster==j,],pch=19, col=j+1)
 }
+points(X[outliers,],pch=19,col=1)
 
-## plottig outliers 
-points(X[ktau_output$outliers, ], pch=19, col=1, cex=1)
-legend(7,15,pch=c(1,1,1,19),col=c(2,3,4,1),cex=1,
-       legend=c("cluster 1" ,"cluster 2","cluster 3","detected \n outliers"),bg = "gray")
-```
-The final figure contains clusters and outliers detected. 
-
-# Improved-ktaucenters 
---------------------
-
-The algorithm ktaucenter works well under noisy data, but fails when
-clusters have different size, shape and orientation, an algorithm
-suitable for this sort of data is `improvektaucenters`. To show how this
-algorithm works we use the data set so-called M5data from package
-`tclust: tclust: Robust Trimmed Clustering`,
-[tclust](https://CRAN.R-project.org/package=tclust). M5
-data were generated by three normal bivariate distributions with
-different scales, one of the components is very overlapped with another
-one. A 10% background noise is added uniformly
-
-::: {#usage .section .level3}
-### usage
-
-First we load the data, then, run the `improvedktaucenters` function.
-
-``` {.r}
-## load non spherical datadata 
-library("tclust")
-data("M5data")
-X=M5data[,1:2]
-true.clusters=M5data[,3]
-### done ###### 
-
-#run the function to estimate clusters
-improved_output=improvedktaucenters(X,K=3,cutoff=0.95)
+plot(X,main="clusters estimation")
+for (j in 1:3){
+  points(X[cluster==j,],pch=19, col=j+1)
+}
+points(X[ret$outliers,],pch=19,col=1)
+par(oldpar)
 ```
 
-We keep the results in the variable `improved_output`, that is a list
-that contains the fields `outliers` and `cluster`, among others. For
-example, we can have access to the cluster labeled as 2 by typing
-
-`X[improved_output$cluster==2, ]`.
-
-If we want to know the values of outliers, type
-
-`X[improved_output$outliers, ]`.
-
-By using these commands, it is easy to estimate the original clusters by
-means of `improvedktaucenters` routine.
-
-
-For more information about this package see  the vignette [ktaucenters_vignette.pdf](https://github.com/jdgonzalezwork/ktaucenters/blob/master/ktaucenters_vignette.pdf). 
-
-The preprint [arxiv:1906.08198](https://arxiv.org/abs/1906.08198)) contains comparision with other robust clustering procedures as well as technical details and applications.   
+The preprint [arxiv:1906.08198](https://arxiv.org/abs/1906.08198)) contains comparison with other robust model-based clustering procedures as well as technical details and applications.   
 
 
