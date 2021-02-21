@@ -54,7 +54,7 @@ B=aux1%*%aux2%*%t(aux1)
 
 X[true.cluster==3,]=X[true.cluster==3,]%*%aux2%*%aux1 + 
 matrix(c(15,2), byrow = TRUE,nrow=100,ncol=2)
-X[true.cluster==2,2] = X[true.cluster==2,2]*2
+X[true.cluster==2,2] = X[true.cluster==2,2]
 X[true.cluster==1,2] = X[true.cluster==1,2]*0.1
 X[true.cluster==1, ] = X[true.cluster==1,]+ 
 matrix(c(-15,-1),byrow = TRUE,nrow=100,ncol=2)
@@ -91,11 +91,17 @@ for (j in 1:3){
 points(X[ret$outliers,],pch=19,col=1)
 par(oldpar)
 ```
+The graphical result of this routine can be viewed below, on the left image, the actual 3 clusters are in different colors, whereas the atypical values are represented in black. The right image shows how the algorithm was able to detect the three clusters and outliers. 
+Of course this is a small example, but in the reference [1], this routine is applied to 
+several synthetic scenarios as well as to real data. 
 
 ![alt text](https://github.com/jdgonzalezwork/RMBC/blob/main/result.png)
 
 
 
-The preprint [arxiv:1906.08198](https://arxiv.org/abs/1906.08198)) contains theoretical results and comparisons with other robust model-based clustering procedures as well as technical details and applications.   
+The preprint [1] contains theoretical results and comparisons with other robust model-based clustering procedures as well as technical details and applications.   
 
+*References:*
+
+[[1] Gonzalez, J. D., Maronna, R., Yohai, V. J., & Zamar, R. H. (2021). Robust Model-Based Clustering. arXiv preprint arXiv:2102.06851.](https://arxiv.org/abs/1906.08198)
 
