@@ -1,4 +1,4 @@
-# RMBC package: Robust and efficient Clustering 
+# RMBC package: Robust Model-Based Clustering 
 ====================================================
 
 #### Juan D. Gonzalez, Ricardo Maronna, Victor J. Yohai and Ruben H. Zamar 
@@ -8,8 +8,9 @@
 ------------
 
 This package implements a clustering algorithm similar to Expectation Maximization 
-algorithm for multivariate Gaussian finite mixture models by using Robust S estimator its main advantage is that The estimator is resistant to outliers, that means that results of
-    estimator are still correct when there are atipycal values in the   sample.
+algorithm for multivariate Gaussian finite mixture models by using Robust S estimator. 
+Its main advantage is that The estimator is resistant to outliers, that means that results of
+estimator are still correct when there are atipycal values in the   sample.
 
 The reference is _Robust Model-Based_ Clustering, Juan D. Gonzalez, Ricardo Maronna
 , Victor J. Yohai, and Ruben H. Zamar [arxiv:2102.06851](https://arxiv.org/pdf/2102.06851.pdf).
@@ -26,7 +27,7 @@ devtools::install_github("jdgonzalezwork/RMBC")
 ``` 
 where the package [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html) must be previously installed.
 
-The following routine generates sythetic data and runs the `RMBC` algorithm. 
+The following routine generates synthetic data and runs the `RMBC` algorithm. 
 
 ``` {.r}
 library("RMBC")
@@ -99,7 +100,7 @@ several synthetic scenarios as well as to real data.
 
 
 
-The preprint [1] contains theoretical results and comparisons with other robust model-based clustering procedures, and technical details and applications.   
+The preprint [1] contains theoretical results and comparisons with other robust model-based clustering procedures. It also has technical details and applications to real data.    
 
 *References:*
 
