@@ -14,6 +14,7 @@
   #' \item{\code{sigma}}{: a list of length K with the location scatter matrix estimators.}
   #' \item{\code{nonoutliers}}{: an array of indices that contains the estimated nonoutliers observations}
   #' \item{\code{outliers}}{: an array of indices that contains the estimated outliers observations}
+  #' \item{\code{cluster}}{: A vector of integers (from 1:k) indicating the cluster to which each point is allocated.}
   #' }
    
   #' @examples 
