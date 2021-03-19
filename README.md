@@ -104,4 +104,4 @@ The preprint [1] contains theoretical results and comparisons with other robust 
 
 *References:*
 
-[[1] Gonzalez, J. D., Maronna, R., Yohai, V. J., & Zamar, R. H. (2021). Robust Model-Based Clustering. arXiv preprint arXiv:2102.06851.](https://arxiv.org/abs/1906.08198)
+[[1] Gonzalez, J. D., Maronna, R., Yohai, V. J., & Zamar, R. H. (2021). Robust Model-Based Clustering. arXiv preprint arXiv:2102.06851.](https://arxiv.org/pdf/2102.06851v2.pdf)
