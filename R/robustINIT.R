@@ -19,7 +19,14 @@ robustINIT=function(Y,K,nstart=10){
   thetaOld.mu <- lapply(1:K, function(i){sal1$centers[i,]})
   thetaOld.sigma <- sal1$sigmas
   # compute alpha among non outliers 
-  alpha <- table(sal1$cluster[-sal1$outliers])/sum(table(sal1$cluster[-sal1$outliers]))
+  if(length(-sal1$outliers)>0){
+    alpha <- table(sal1$cluster[-sal1$outliers])/sum(table(sal1$cluster[-sal1$outliers]))
+  }
+  # the above if gave error (alpha=numeric(0) if there are not outliers detected, 
+  # (fixed with the below if)
+  if(length(-sal1$outliers)==0){
+    alpha <- table(sal1$cluster)/sum(table(sal1$cluster))
+  }
   alpha <- as.numeric(alpha)
   list(alphaINIT=alpha,muINIT=thetaOld.mu,sigmaINIT=thetaOld.sigma,indicesINIT=sal1$cluster)
 }

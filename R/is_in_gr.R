@@ -1,9 +1,9 @@
 #' is_in_gr
 #' 
 #' Given Y  data  and a set of mixture parameters, this function
-#' return a  boolean vector B whose lentght is equal than Y length.
-#' B[i] is TRUE if only if Y[i] not belong to the  union of
-#' confidence ellipsoids of level given by  the level
+#' returns a  boolean vector B whose length is equal than Y length.
+#' A[i] is TRUE if only if Y[i] does not belong to the  union of
+#' confidence ellipsoids of level given by the cutoff parameter. 
 
 #' @param Y A matrix of size n x p.
 #' @param theta.mu The estimated centers: A list with K elements, each of them 
@@ -33,5 +33,6 @@ is_in_gr=function(Y,cutoff=0.999,theta.mu,theta.sigma){
   for (i in 1:n){
     is_in_gr_out[i]=any(d[i,]<value)
   }
-  is_in_gr_out
+  A=is_in_gr_out
+  A 
 }

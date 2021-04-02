@@ -1,5 +1,51 @@
 {
     "debugBreakpointsState": {
-        "breakpoints": []
+        "breakpoints": [
+            {
+                "id": 1,
+                "path": "~/Dropbox/3_Clustering/2017/WeightedSestimator/MixtureSimulacionVirtualMachine/codes/CodesToBeUploaded/package/RMBC/R/RMBCaux.R",
+                "line_number": 96,
+                "function_steps": "10,3,8,4,3,3,3",
+                "function_name": "RMBCaux",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 96,
+                "is_pending_debug_completion": true,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            },
+            {
+                "id": 2,
+                "path": "~/Dropbox/3_Clustering/2017/WeightedSestimator/MixtureSimulacionVirtualMachine/codes/CodesToBeUploaded/package/RMBC/R/RMBCaux.R",
+                "line_number": 54,
+                "function_steps": "8,3,3,3,2",
+                "function_name": "RMBCaux",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 54,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "RMBC"
+            },
+            {
+                "id": 4,
+                "path": "~/Dropbox/3_Clustering/2017/WeightedSestimator/MixtureSimulacionVirtualMachine/codes/CodesToBeUploaded/package/RMBC/R/RMBC.R",
+                "line_number": 87,
+                "function_steps": "3",
+                "function_name": "RMBC",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 87,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "RMBC"
+            }
+        ]
     }
 }
